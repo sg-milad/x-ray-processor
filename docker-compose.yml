@@ -2,7 +2,6 @@ version: "3.8"
 
 services:
     mongodb:
-        # This image automatically creates a replica set required for transactions
         image: prismagraphql/mongo-single-replica:4.4.3-bionic
         container_name: mongodb
         environment:
@@ -11,58 +10,69 @@ services:
             INIT_WAIT_SEC: 5
         ports:
             - 27017:27017
+        volumes:
+            - mongodb_data:/data/db
+        networks:
+            - app-network
 
-    # RabbitMQ service
     rabbitmq:
         image: rabbitmq:management
         container_name: rabbitmq
-        environment:
-            RABBITMQ_DEFAULT_USER: user
-            RABBITMQ_DEFAULT_PASS: password
         ports:
             - "15672:15672" # RabbitMQ Management UI
             - "5672:5672" # AMQP protocol
+        environment:
+            RABBITMQ_DEFAULT_USER: guest
+            RABBITMQ_DEFAULT_PASS: guest
+        healthcheck:
+            test: ["CMD", "rabbitmqctl", "status"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
         networks:
-            - backend
+            - app-network
 
     producer:
         build:
-            context: ./apps/producer
-            dockerfile: Dockerfile
+            context: .
+            dockerfile: apps/producer/Dockerfile
         container_name: producer
         environment:
             - NODE_ENV=production
-            - RABBITMQ_URI=amqp://user:password@rabbitmq:5672
-            - MONGO_URI=mongodb://root:rootpassword@mongo:27017/mydatabase
+            - RABBITMQ_URL=amqp://rabbitmq:5672
         depends_on:
-            - rabbitmq
-            - mongo
-        networks:
-            - backend
+            rabbitmq:
+                condition: service_healthy
+            mongodb:
+                condition: service_started
         ports:
             - "3001:3000"
+        networks:
+            - app-network
 
-    # X-Ray Processor App (NestJS)
     xray-processor:
         build:
-            context: ./apps/x-ray-processor
-            dockerfile: Dockerfile
+            context: .
+            dockerfile: apps/x-ray-processor/Dockerfile
         container_name: xray-processor
+        restart: unless-stopped
         environment:
             - NODE_ENV=production
-            - RABBITMQ_URI=amqp://user:password@rabbitmq:5672
-            - MONGO_URI=mongodb://root:rootpassword@mongo:27017/mydatabase
+            - RABBITMQ_URL=amqp://rabbitmq:5672
+            - MONGO_URI=mongodb://root:pass@mongodb:27017/xray?replicaSet=rs0&authSource=admin&retryWrites=true&w=majority&directConnection=true
         depends_on:
-            - rabbitmq
-            - mongo
-        networks:
-            - backend
+            rabbitmq:
+                condition: service_healthy
+            mongodb:
+                condition: service_started
         ports:
             - "3000:3000"
-
-networks:
-    backend:
-        driver: bridge
+        networks:
+            - app-network
 
 volumes:
-    mongo_data:
+    mongodb_data:
+
+networks:
+    app-network:
+        driver: bridge

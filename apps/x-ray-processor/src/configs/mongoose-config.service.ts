@@ -5,11 +5,11 @@ import { MongooseModuleOptions, MongooseOptionsFactory } from "@nestjs/mongoose"
 
 @Injectable()
 export class MongooseConfigService implements MongooseOptionsFactory {
-    constructor(private readonly configService: ConfigService) {}
+    constructor(private readonly configService: ConfigService) { }
 
     createMongooseOptions(): MongooseModuleOptions {
         return {
-            uri: this.configService.get<string>("database.main.mongoUrl", "mongodb://localhost:27017/xray"), // Default fallback URI
+            uri: this.configService.get<string>("database.main.mongoUrl"), // Default fallback URI
         };
     }
 

@@ -10,7 +10,7 @@ async function bootstrap() {
     swagger.configure(app);
 
     const appConfig = app.get(ConfigService);
-    app.connectMicroservice<MicroserviceOptions>(createTransport(appConfig));
+    await app.connectMicroservice<MicroserviceOptions>(createTransport(appConfig));
     await app.startAllMicroservices();
 
     await app.listen(3000);
