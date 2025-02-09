@@ -1,12 +1,17 @@
-import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { ConfigModule } from '@nestjs/config';
-import { ConfigModuleOptions } from './configs/config.module.options';
+import { Module } from "@nestjs/common";
+import { ConfigModule } from "@nestjs/config";
+import { ConfigModuleOptions } from "./configs/config.module.options";
+import { XrayModule } from "./xray/xray.module";
+import { MongooseModule } from "@nestjs/mongoose";
+import { MongooseConfigService } from "./configs/mongoose-config.service";
 
 @Module({
-  imports: [ConfigModule.forRoot(ConfigModuleOptions()),],
-  controllers: [AppController],
-  providers: [AppService],
+    imports: [
+        ConfigModule.forRoot(ConfigModuleOptions()),
+        XrayModule,
+        MongooseModule.forRootAsync({
+            useClass: MongooseConfigService,
+        }),
+    ],
 })
-export class AppModule { }
+export class AppModule {}

@@ -4,10 +4,7 @@ import { developmentEnv } from "./helper/helper";
 
 const configure = (app: INestApplication) => {
     // if (!developmentEnv()) return;
-    const swaggerConfig = new DocumentBuilder()
-        .setTitle(`x-ray`)
-        .setVersion("1.0.0")
-        .build();
+    const swaggerConfig = new DocumentBuilder().setTitle(`x-ray`).setVersion("1.0.0").build();
 
     const document = SwaggerModule.createDocument(app, swaggerConfig);
     SwaggerModule.setup("/docs", app, document);
