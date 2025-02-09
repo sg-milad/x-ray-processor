@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from "@nestjs/common";
+import { BadRequestException, Injectable, Logger, NotFoundException } from "@nestjs/common";
 import { Model } from "mongoose";
 import { InjectModel } from "@nestjs/mongoose";
 import { XRayData } from "./schemas/xray.schema";
@@ -9,7 +9,7 @@ import { MainDto } from "./dto/xray.dto";
 export class XrayService {
     private readonly logger = new Logger(XrayService.name);
 
-    constructor(@InjectModel(XRayData.name) private readonly xrayModel: Model<XRayData>) {}
+    constructor(@InjectModel(XRayData.name) private readonly xrayModel: Model<XRayData>) { }
 
     async create(createXrayDto: CreateXRayDto) {
         const createdXray = new this.xrayModel(createXrayDto);
@@ -51,7 +51,7 @@ export class XrayService {
 
             this.logger.log("X-ray data processed successfully", deviceId);
             if (!deviceData || !Array.isArray(deviceData.data) || !deviceData.data.length) {
-                throw new Error("Invalid data structure");
+                throw new BadRequestException()
             }
             const processedData = {
                 deviceId,
