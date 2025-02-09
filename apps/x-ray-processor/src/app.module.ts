@@ -3,10 +3,9 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { ConfigModuleOptions } from './configs/config.module.options';
-import { ProducerModule } from './producer/producer.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(ConfigModuleOptions()), ProducerModule,],
+  imports: [ConfigModule.forRoot(ConfigModuleOptions()),],
   controllers: [AppController],
   providers: [AppService],
 })

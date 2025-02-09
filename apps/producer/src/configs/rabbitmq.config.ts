@@ -1,18 +1,18 @@
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ClientsProviderAsyncOptions } from '@nestjs/microservices/module/interfaces/clients-module.interface';
-import { DAILY_SALES_REPORT_QUEUE } from '../shared/constant/rabitmq.queue';
+import { XRAY_QUEUE } from '../shared/constant/rabitmq.queue';
 
-export const RABBITMQ_CLIENT_PROVIDER = 'EMAIL_SERVICE';
+export const RABBITMQ_CLIENT_PROVIDER = 'XRAY';
 
-export const EmailServiceClient: ClientsProviderAsyncOptions = {
+export const XrayServiceClient: ClientsProviderAsyncOptions = {
   name: RABBITMQ_CLIENT_PROVIDER,
   imports: [ConfigModule],
   useFactory: (configService: ConfigService) => ({
     transport: Transport.RMQ,
     options: {
       urls: [configService.get<string>('app.transport.urls') as string],
-      queue: DAILY_SALES_REPORT_QUEUE,
+      queue: XRAY_QUEUE,
       queueOptions: {
         durable: true,
       },
@@ -22,4 +22,4 @@ export const EmailServiceClient: ClientsProviderAsyncOptions = {
   inject: [ConfigService],
 };
 
-export const Clients = ClientsModule.registerAsync([EmailServiceClient]);
+export const Clients = ClientsModule.registerAsync([XrayServiceClient]);
