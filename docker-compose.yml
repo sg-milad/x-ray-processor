@@ -1,0 +1,68 @@
+version: "3.8"
+
+services:
+    mongodb:
+        # This image automatically creates a replica set required for transactions
+        image: prismagraphql/mongo-single-replica:4.4.3-bionic
+        container_name: mongodb
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: root
+            MONGO_INITDB_ROOT_PASSWORD: pass
+            INIT_WAIT_SEC: 5
+        ports:
+            - 27017:27017
+
+    # RabbitMQ service
+    rabbitmq:
+        image: rabbitmq:management
+        container_name: rabbitmq
+        environment:
+            RABBITMQ_DEFAULT_USER: user
+            RABBITMQ_DEFAULT_PASS: password
+        ports:
+            - "15672:15672" # RabbitMQ Management UI
+            - "5672:5672" # AMQP protocol
+        networks:
+            - backend
+
+    producer:
+        build:
+            context: ./apps/producer
+            dockerfile: Dockerfile
+        container_name: producer
+        environment:
+            - NODE_ENV=production
+            - RABBITMQ_URI=amqp://user:password@rabbitmq:5672
+            - MONGO_URI=mongodb://root:rootpassword@mongo:27017/mydatabase
+        depends_on:
+            - rabbitmq
+            - mongo
+        networks:
+            - backend
+        ports:
+            - "3001:3000"
+
+    # X-Ray Processor App (NestJS)
+    xray-processor:
+        build:
+            context: ./apps/x-ray-processor
+            dockerfile: Dockerfile
+        container_name: xray-processor
+        environment:
+            - NODE_ENV=production
+            - RABBITMQ_URI=amqp://user:password@rabbitmq:5672
+            - MONGO_URI=mongodb://root:rootpassword@mongo:27017/mydatabase
+        depends_on:
+            - rabbitmq
+            - mongo
+        networks:
+            - backend
+        ports:
+            - "3000:3000"
+
+networks:
+    backend:
+        driver: bridge
+
+volumes:
+    mongo_data:
