@@ -6,11 +6,12 @@ import { EventPattern, Payload } from "@nestjs/microservices";
 import { XRAY } from "../shared/constant/rabitmq.queue";
 import { CreateXRayDto } from "./dto/create.xray.dto";
 import { XRayData } from "./schemas/xray.schema";
+import { ParseObjectIdPipe } from "../shared/pipe/parse.objectId.Pipe";
 
 @ApiTags("Xray")
 @Controller("xray")
 export class XrayController {
-    constructor(private readonly xrayService: XrayService) {}
+    constructor(private readonly xrayService: XrayService) { }
 
     @EventPattern(XRAY)
     async eventHandler(@Payload() data: MainDto) {
@@ -48,7 +49,7 @@ export class XrayController {
         type: CreateXRayDto,
     })
     @ApiResponse({ status: 404, description: "Xray record not found." })
-    async findOne(@Param("id") id: string): Promise<XRayData> {
+    async findOne(@Param("id", ParseObjectIdPipe) id: string): Promise<XRayData> {
         return await this.xrayService.findOne(id);
     }
 
@@ -60,7 +61,7 @@ export class XrayController {
         type: CreateXRayDto,
     })
     @ApiResponse({ status: 404, description: "Xray record not found." })
-    async update(@Param("id") id: string, @Body() updateXrayDto: CreateXRayDto): Promise<XRayData> {
+    async update(@Param("id", ParseObjectIdPipe) id: string, @Body() updateXrayDto: CreateXRayDto): Promise<XRayData> {
         return await this.xrayService.update(id, updateXrayDto);
     }
 
@@ -72,7 +73,7 @@ export class XrayController {
         type: CreateXRayDto,
     })
     @ApiResponse({ status: 404, description: "Xray record not found." })
-    async remove(@Param("id") id: string): Promise<XRayData> {
+    async remove(@Param("id", ParseObjectIdPipe) id: string): Promise<XRayData> {
         return await this.xrayService.remove(id);
     }
 }
