@@ -9,7 +9,7 @@ import { MainDto } from "./dto/xray.dto";
 export class XrayService {
     private readonly logger = new Logger(XrayService.name);
 
-    constructor(@InjectModel(XRayData.name) private readonly xrayModel: Model<XRayData>) { }
+    constructor(@InjectModel(XRayData.name) private readonly xrayModel: Model<XRayData>) {}
 
     async create(createXrayDto: CreateXRayDto) {
         const createdXray = new this.xrayModel(createXrayDto);
@@ -51,7 +51,7 @@ export class XrayService {
 
             this.logger.log("X-ray data processed successfully", deviceId);
             if (!deviceData || !Array.isArray(deviceData.data) || !deviceData.data.length) {
-                throw new BadRequestException()
+                throw new BadRequestException();
             }
             const processedData = {
                 deviceId,

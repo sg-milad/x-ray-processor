@@ -11,7 +11,7 @@ import { ParseObjectIdPipe } from "../shared/pipe/parse.objectId.Pipe";
 @ApiTags("Xray")
 @Controller("xray")
 export class XrayController {
-    constructor(private readonly xrayService: XrayService) { }
+    constructor(private readonly xrayService: XrayService) {}
 
     @EventPattern(XRAY)
     async eventHandler(@Payload() data: MainDto) {

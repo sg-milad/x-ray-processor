@@ -91,7 +91,7 @@ describe("XrayController (e2e)", () => {
 
     it("/GET xray/:id", () => {
         return request(app.getHttpServer())
-            .get("/xray/1")
+            .get("/xray/67b1b59a3327374c04d0963d")
             .expect(200)
             .expect({
                 deviceId: "device123",
@@ -107,7 +107,7 @@ describe("XrayController (e2e)", () => {
 
     it("/DELETE xray/:id", () => {
         return request(app.getHttpServer())
-            .delete("/xray/1")
+            .delete("/xray/67b1b59a3327374c04d0963d")
             .expect(200)
             .expect({
                 deviceId: "device123",
